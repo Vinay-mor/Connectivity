@@ -24,7 +24,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {authClient} from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 const loginSchema = z.object({
     email: z.email("Please enter a valid email address"),
     password: z.string().min(1, "Password is required"),
@@ -41,14 +41,14 @@ export function LoginForm() {
     });
     const onSubmit = async (values: LoginFormValues) => {
         await authClient.signIn.email({
-            email:values.email,
-            password:values.password,
-            callbackURL:"/",
-        },{
-            onSuccess:()=>{
+            email: values.email,
+            password: values.password,
+            callbackURL: "/",
+        }, {
+            onSuccess: () => {
                 router.push("/");
             },
-            onError:(ctx)=>{
+            onError: (ctx) => {
                 toast.error(ctx.error.message)
             }
         })
@@ -76,6 +76,7 @@ export function LoginForm() {
                                         type="button"
                                         disabled={isPending}
                                     >
+                                        <Image alt="Github" src="/logos/github.svg" width={20} height={20} />
                                         Continue with GitHub
                                     </Button>
                                     <Button
@@ -84,57 +85,59 @@ export function LoginForm() {
                                         type="button"
                                         disabled={isPending}
                                     >
-                                        Continue with GitHub
+                                        <Image alt="Google" src="/logos/google.svg" width={20} height={20} />
+
+                                        Continue with Google
                                     </Button>
                                 </div>
                                 <div className="grid gap-6">
                                     <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({field})=>(
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                type="email"
-                                                placeholder="m@example.com"
-                                                {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
+                                        control={form.control}
+                                        name="email"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Email</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="m@example.com"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                     <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({field})=>(
-                                        <FormItem>
-                                            <FormLabel>Password</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                type="password"
-                                                placeholder="********"
-                                                {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
+                                        control={form.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Password</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="********"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                     <Button type="submit"
-                                    className="w-full" disabled={isPending}>
-                                       Login 
+                                        className="w-full" disabled={isPending}>
+                                        Login
                                     </Button>
                                 </div>
-                                    <div className="text-center text-sm">
-                                        Don&apos;t have an account?{" "}
-                                        <Link href="/signup"
+                                <div className="text-center text-sm">
+                                    Don&apos;t have an account?{" "}
+                                    <Link href="/signup"
                                         className="underline underline-offset-4">
                                         Sign up
-                                        </Link>
+                                    </Link>
 
-                                    </div>
+                                </div>
                             </div>
 
                         </form>
