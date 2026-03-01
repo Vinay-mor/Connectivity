@@ -5,7 +5,7 @@ import Link from "next/link";
 type EntityHeaderProps = {
     title: string;
     description?: string;
-    newButonLabel: string;
+    newButtonLabel: string;
     disabled?: boolean;
     isCreating?: boolean;
 } & (
@@ -14,10 +14,10 @@ type EntityHeaderProps = {
         | { onNew?: never; newButtonHref?: never }
     );
 
-export const EntityHeader = ({ title, description, onNew, newButonLabel, newButtonHref, disabled, isCreating }: EntityHeaderProps) => {
+export const EntityHeader = ({ title, description, onNew, newButtonLabel, newButtonHref, disabled, isCreating }: EntityHeaderProps) => {
     return (
         <div className="flex flex-row items-center justify-between gap-x-4">
-            <div className="flex-flex-col">
+            <div className="flex flex-col">
                 <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
                 {description && (
                     <p className="text-xs md:text-sm text-muted-foreground">
@@ -31,7 +31,7 @@ export const EntityHeader = ({ title, description, onNew, newButonLabel, newButt
                     onClick={onNew}
                 >
                     <PlusIcon className="size-4" />
-                    {newButonLabel}
+                    {newButtonLabel}
                 </Button>
             )}
             {newButtonHref && !onNew && (
@@ -41,7 +41,7 @@ export const EntityHeader = ({ title, description, onNew, newButonLabel, newButt
                 >
                     <Link prefetch href={newButtonHref}>
                         <PlusIcon className="size-4" />
-                        {newButonLabel}
+                        {newButtonLabel}
                     </Link>
                 </Button>
             )}
