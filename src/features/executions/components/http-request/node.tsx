@@ -6,6 +6,7 @@ import { memo, useState } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { HttpRequestFormValues, HttpRequestDialog } from "./dialog";
 type HttpRequestNodeData = {
+    variableName?:string,
     endpoint?: string;
     method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
     body?: string;
@@ -18,7 +19,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
     const { setNodes } = useReactFlow();
     const nodeData = props.data;
     const description = nodeData?.endpoint
-        ? `${nodeData.method || "GET"}:${nodeData.endpoint}"`
+        ? `${nodeData.method || "GET"}:${nodeData.endpoint}`
         : "Not Configured"
     const nodeStatus = "initial"
     const handleOpenSettings = () => setDialogOpen(true);
@@ -29,6 +30,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
                     ...node,
                     data: {
                         ...node.data,
+                        variableName: values.variableName,
                         endpoint: values.endpoint,
                         method: values.method,
                         body: values.body,
