@@ -2,11 +2,13 @@ import { NodeType } from "@/generated/prisma/enums";
 import { NodeExecutor } from "../types";
 import { ManualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { httpRequestExecutor } from "../components/http-request/executor";
+import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 
 export const executorRegistry:Record<NodeType,NodeExecutor>={
     [NodeType.MANUAL_TRIGGER]:ManualTriggerExecutor,
     [NodeType.INITIAL]:ManualTriggerExecutor,
     [NodeType.HTTP_REQUEST]:httpRequestExecutor,
+    [NodeType.GOOGLE_FORM_TRIGGER]:googleFormTriggerExecutor,
 
 };
 

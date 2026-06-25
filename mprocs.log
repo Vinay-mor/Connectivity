@@ -79,3 +79,14 @@ ERROR [lib::mprocs] Got panic. @info:panicked at src\vt100\screen.rs:457:10:
 called `Option::unwrap()` on a `None` value
 @stackTrace:disabled backtrace
 ERROR [lib::error] Error: channel closed
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run ngrok:dev\0"` in cwd `Some("D:\\web development\\project\\connectivity\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [lib::error] Error: channel closed
