@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
         if(!workflowId){
             return NextResponse.json(
-                {success:false,error:"Missing required quesry parameter:workflowId"},
+                {success:false,error:"Missing required query parameter:workflowId"},
                 {status:400},
             );
         };
