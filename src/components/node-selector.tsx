@@ -14,6 +14,7 @@ export type NodeTypeOption = {
     label: string;
     description: string;
     icon: React.ComponentType<{ className?: string }> | string;
+    iconClassName?: string;
 };
 
 const triggerNodes: NodeTypeOption[] = [
@@ -43,6 +44,27 @@ const executionNodes: NodeTypeOption[] = [
         label: "HTTP Request",
         description: "Makes an HTTP request",
         icon: GlobeIcon,
+    },
+    {
+        type: NodeType.GEMINI,
+        label: "Gemini",
+        description: "Uses Google Gemini to generate text",
+        icon: "/logos/gemini.svg",
+        iconClassName: "size-20 object-contain",
+    },
+    {
+        type: NodeType.OPENAI,
+        label: "OpenAI",
+        description: "Uses OpenAI to generate text",
+        icon: "/logos/openai.svg",
+        iconClassName: "size-20 object-contain",
+    },
+    {
+        type: NodeType.ANTHROPIC,
+        label: "Anthropic",
+        description: "Uses Anthropic to generate text",
+        icon: "/logos/anthropic.svg",
+        iconClassName: "size-20 object-contain",
     },
 ];
 
@@ -126,7 +148,7 @@ export function NodeSelector({
                                         <img
                                             src={Icon}
                                             alt={nodeType.label}
-                                            className="" />
+                                            className={nodeType.iconClassName ?? ""} />
                                     ) : (
                                         <Icon className="size-5" />
                                     )}
@@ -159,7 +181,7 @@ export function NodeSelector({
                                         <img
                                             src={Icon}
                                             alt={nodeType.label}
-                                            className="" />
+                                            className={nodeType.iconClassName ?? ""} />
                                     ) : (
                                         <Icon className="size-5" />
                                     )}
