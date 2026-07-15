@@ -9,6 +9,7 @@ import { fetchOpenAiRealtimeToken } from "./actions";
 import { OpenAiDialog, OpenAiFormValues } from "./dialog";
 type OpenAiNodeData = {
     variableName?:string;
+    credentialId?:string;
     systemPrompt?: string;
     userPrompt?: string;
 };
@@ -33,6 +34,7 @@ export const OpenAiNode = memo((props: NodeProps<OpenAiNodeType>) => {
                     data: {
                         ...node.data,
                         variableName: values.variableName,
+                        credentialId: values.credentialId,
                         systemPrompt: values.systemPrompt,
                         userPrompt: values.userPrompt,
                     }

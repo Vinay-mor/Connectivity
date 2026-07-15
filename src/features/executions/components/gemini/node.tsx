@@ -9,6 +9,7 @@ import { GEMINI_CHANNEL_NAME } from "@/inngest/channels/gemini";
 import { GeminiDialog, GeminiFormValues } from "./dialog";
 type GeminiNodeData = {
     variableName?:string;
+    credentialId?:string;
     systemPrompt?: string;
     userPrompt?: string;
 };
@@ -33,6 +34,7 @@ export const GeminiNode = memo((props: NodeProps<GeminiNodeType>) => {
                     data: {
                         ...node.data,
                         variableName: values.variableName,
+                        credentialId: values.credentialId,
                         systemPrompt: values.systemPrompt,
                         userPrompt: values.userPrompt,
                     }
@@ -43,7 +45,7 @@ export const GeminiNode = memo((props: NodeProps<GeminiNodeType>) => {
     };
     const nodeData=props.data;
     const description=nodeData?.userPrompt
-        ?`"gemini-2.0-flash":${nodeData.userPrompt.slice(0,50)}...`
+        ?`"gemini-3.5-flash":${nodeData.userPrompt.slice(0,50)}...`
         :"Not configured";
     return (
         <>

@@ -9,6 +9,7 @@ import { AnthropicDialog, AnthropicFormValues} from "./dialog";
 import { ANTHROPIC_CHANNEL_NAME } from "@/inngest/channels/anthropic";
 type AnthropicNodeData = {
     variableName?:string;
+    credentialId?:string;
     systemPrompt?: string;
     userPrompt?: string;
 };
@@ -33,6 +34,7 @@ export const AnthropicNode = memo((props: NodeProps<AnthropicNodeType>) => {
                     data: {
                         ...node.data,
                         variableName: values.variableName,
+                        credentialId: values.credentialId,
                         systemPrompt: values.systemPrompt,
                         userPrompt: values.userPrompt,
                     }

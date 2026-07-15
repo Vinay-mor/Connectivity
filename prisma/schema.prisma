@@ -15,16 +15,17 @@ datasource db {
 }
 
 model User {
-  id            String     @id
+  id            String       @id
   name          String
   email         String
-  emailVerified Boolean    @default(false)
+  emailVerified Boolean      @default(false)
   image         String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
   workflows     Workflow[]
+  credentials   Credential[]
 
   @@unique([email])
   @@map("user")
@@ -78,6 +79,26 @@ model Verification {
   @@map("verification")
 }
 
+model Credential {
+  id        String   @id @default(cuid())
+  name      String
+  value     String
+  type  CredentialType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  Node Node[]
+}
+
+enum CredentialType{
+  OPENAI
+  ANTHROPIC
+  GEMINI
+}
+
 model Workflow {
   id        String   @id @default(cuid())
   name      String
@@ -99,7 +120,6 @@ enum NodeType {
   ANTHROPIC
   GEMINI
   OPENAI
-
 }
 
 model Node {
@@ -111,12 +131,13 @@ model Node {
   type     NodeType
   position Json
   data     Json     @default("{}")
-
   outputConnections Connection[] @relation("FromNode")
   inputConnections  Connection[] @relation("ToNode")
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  credentialId String?
+  credential   Credential? @relation(fields: [credentialId], references: [id])
 }
 
 model Connection {
@@ -135,7 +156,6 @@ model Connection {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
 
   @@unique([fromNodeId, toNodeId, fromOutput, toInput])
 }
