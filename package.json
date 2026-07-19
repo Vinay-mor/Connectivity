@@ -37,6 +37,8 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "handlebars": "^4.7.9",
+    "html": "^1.0.0",
+    "html-entities": "^2.6.0",
     "inngest": "^3.52.3",
     "input-otp": "^1.4.2",
     "jotai": "^2.20.0",
