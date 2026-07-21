@@ -40,7 +40,7 @@
     "handlebars": "^4.7.9",
     "html": "^1.0.0",
     "html-entities": "^2.6.0",
-    "inngest": "^3.52.3",
+    "inngest": "^3.54.2",
     "input-otp": "^1.4.2",
     "jotai": "^2.20.0",
     "ky": "^2.0.2",
