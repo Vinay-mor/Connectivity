@@ -5,6 +5,7 @@ import { generateText } from "ai";
 import { NonRetriableError } from "inngest";
 import { anthropicChannel } from "@/inngest/channels/anthropic";
 import prisma from "@/lib/db";
+import { decrypt } from "@/lib/encryption";
 Handlebars.registerHelper("json", (context) => {
     const jsonString = JSON.stringify(context, null, 2);
     const safeString = new Handlebars.SafeString(jsonString);
@@ -80,7 +81,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
         throw new NonRetriableError("Anthropic node:Credential not found");
     }
     const anthropic = createAnthropic({
-        apiKey: credential.value,
+        apiKey: decrypt(credential.value),
     });
 
     try {
