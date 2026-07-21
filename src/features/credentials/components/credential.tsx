@@ -1,6 +1,6 @@
 "use client";
 
-import { CredentialType } from "@/generated/prisma/enums";
+import { CredentialType } from "@/lib/prisma-enums";
 import { useCreateCredentials, useUpdateCredential, useSuspenseCredential } from "../hooks/use-credentials";
 import { useUpgradeModel } from "@/hooks/use-upgrade-modal";
 import Image from "next/image";
@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import type { Credential } from "@/generated/prisma";
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
