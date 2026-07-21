@@ -1,5 +1,5 @@
 "use client"
-import { ExecutionStatus } from "@/generated/prisma/enums";
+import { ExecutionStatus } from "@/lib/prisma-enums";
 import { CheckCircle2Icon, ClockIcon, Loader2Icon, XCircleIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -18,6 +18,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useSuspenseExecution } from "../hooks/use-executions";
+import type { Execution } from "@/generated/prisma";
 
 const getStatusIcon = (status: ExecutionStatus) => {
     switch (status) {

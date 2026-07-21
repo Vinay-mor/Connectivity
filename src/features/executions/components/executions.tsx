@@ -4,7 +4,8 @@ import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, Entit
 import { useSuspenseExecutions } from "../hooks/use-executions"
 import React from "react";
 import { useExecutionsParams } from "../hooks/use-executions-params";
-import { ExecutionStatus, Execution } from "@/generated/prisma/browser";
+import { ExecutionStatus } from "@/lib/prisma-enums";
+import type { Execution } from "@/generated/prisma";
 import { CheckCircle2Icon, ClockIcon, Loader2Icon, XCircleIcon } from "lucide-react";
 
 export const ExecutionsList = () => {
