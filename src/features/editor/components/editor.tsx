@@ -74,9 +74,14 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
                     hideAttribution:true,
                 }}
             >   
-            <Background/>
-            <Controls/>
-            <MiniMap/>
+            <Background />
+            <Controls className="m-4" />
+            <MiniMap
+              className="m-4 rounded-xl overflow-hidden shadow-lg border border-border/80"
+              zoomable
+              pannable
+              nodeColor="#06B6D4"
+            />
             <Panel position="top-right">
                 <AddNodeButton/>
             </Panel>
