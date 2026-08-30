@@ -30,8 +30,11 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Connectivity | Workflow Automation Suite",
-  description: "Bespoke modern workflow automation suite",
+  title: "Connectivity | AI-Powered Workflow Automation Platform",
+  description: "Build, connect, and automate complex workflows with ease.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
