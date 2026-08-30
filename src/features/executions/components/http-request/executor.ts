@@ -34,7 +34,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
 
 
     try {
-        const result = await step.run("http-request", async () => {
+        const result = await step.run(`http-request-${nodeId}`, async () => {
             if (!data.endpoint) {
                 await publish(
                     httpRequestChannel().status({
@@ -72,7 +72,11 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
 
             if (["POST", "PUT", "PATCH"].includes(method)) {
                 const resolved = Handlebars.compile(data.body || "{}")(context);
-                JSON.parse(resolved);
+                try {
+                    JSON.parse(resolved);
+                } catch {
+                    // ignore parse error if custom body
+                }
                 options.body = resolved;
                 options.headers = {
                     "Content-Type": "application/json",
@@ -80,15 +84,29 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
             }
 
             const response = await ky(endpoint, options);
-            const contentType = response.headers.get("context-type");
-            const responseData = contentType?.includes("application/json") ? await response.json() : await response.text();
+            const contentType = response.headers.get("content-type");
+            let responseData: unknown;
+            if (contentType?.includes("application/json")) {
+                responseData = await response.json();
+            } else {
+                const text = await response.text();
+                try {
+                    responseData = JSON.parse(text);
+                } catch {
+                    responseData = text;
+                }
+            }
+
+            const responseObj = {
+                status: response.status,
+                statusText: response.statusText,
+                data: responseData,
+            };
 
             const responsePayload = {
-                hrrpResponse: {
-                    status: response.status,
-                    statusText: response.statusText,
-                    data: responseData,
-                },
+                httpResponse: responseObj,
+                hrrpResponse: responseObj,
+                data: responseData,
             };
 
             return {
