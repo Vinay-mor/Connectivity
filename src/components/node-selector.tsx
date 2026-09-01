@@ -2,7 +2,7 @@
 
 import { createId } from "@paralleldrive/cuid2";
 import { useReactFlow } from "@xyflow/react";
-import { GlobeIcon, MousePointerIcon, ZapIcon } from "lucide-react";
+import { GitForkIcon, GlobeIcon, MousePointerIcon, ZapIcon } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -86,6 +86,12 @@ const executionNodes: NodeTypeOption[] = [
     description: "Send automated messages to a Slack channel",
     icon: "/logos/slack.svg",
     iconClassName: "size-5 object-contain",
+  },
+  {
+    type: NodeType.IF_ELSE,
+    label: "If / Else Condition",
+    description: "Branch workflow execution paths based on evaluated node conditions",
+    icon: GitForkIcon,
   },
 ];
 

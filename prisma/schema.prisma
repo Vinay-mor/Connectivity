@@ -123,6 +123,7 @@ enum NodeType {
   OPENAI
   DISCORD
   SLACK
+  IF_ELSE
 }
 
 model Node {

@@ -9,6 +9,7 @@ import { openAiExecutor } from "../components/openai/executor";
 import { anthropicExecutor } from "../components/anthropic/executor";
 import { discordExecutor } from "../components/discord/executor";
 import { slackExecutor } from "../components/slack/executor";
+import { ifElseExecutor } from "../components/if-else/executor";
 
 export const executorRegistry:Record<NodeType,NodeExecutor>={
     [NodeType.MANUAL_TRIGGER]:ManualTriggerExecutor,
@@ -21,7 +22,7 @@ export const executorRegistry:Record<NodeType,NodeExecutor>={
     [NodeType.OPENAI]:openAiExecutor,
     [NodeType.DISCORD]:discordExecutor,
     [NodeType.SLACK]:slackExecutor,
-
+    [NodeType.IF_ELSE]:ifElseExecutor,
 };
 
 export const getExecutor=(type:NodeType):NodeExecutor=>{

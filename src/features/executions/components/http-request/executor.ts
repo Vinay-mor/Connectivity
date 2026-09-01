@@ -105,7 +105,6 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
 
             const responsePayload = {
                 httpResponse: responseObj,
-                hrrpResponse: responseObj,
                 data: responseData,
             };
 
