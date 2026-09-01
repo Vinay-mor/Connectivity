@@ -10,6 +10,7 @@ import { NodeStatusIndicator } from "@/components/react-flow/node-status-indicat
 import { IfElseDialog, type IfElseFormValues } from "./dialog";
 import { useNodeStatus } from "../../hooks/use-node-status";
 import { IF_ELSE_CHANNEL_NAME } from "@/inngest/channels/if-else";
+import { useParams } from "next/navigation";
 import { fetchIfElseRealtimeToken } from "./actions";
 
 type IfElseNodeData = {
@@ -22,6 +23,8 @@ type IfElseNodeData = {
 type IfElseNodeType = Node<IfElseNodeData>;
 
 export const IfElseNode = memo((props: NodeProps<IfElseNodeType>) => {
+    const params = useParams();
+    const workflowId = params.workflowId as string;
     const [dialogOpen, setDialogOpen] = useState(false);
     const { setNodes, setEdges } = useReactFlow();
     const nodeData = props.data;
@@ -32,9 +35,9 @@ export const IfElseNode = memo((props: NodeProps<IfElseNodeType>) => {
 
     const nodeStatus = useNodeStatus({
         nodeId: props.id,
-        channel: IF_ELSE_CHANNEL_NAME,
+        channel: `${IF_ELSE_CHANNEL_NAME}:${workflowId}`,
         topic: "status",
-        refreshToken: fetchIfElseRealtimeToken,
+        refreshToken: () => fetchIfElseRealtimeToken(workflowId),
     });
 
     const handleOpenSettings = () => setDialogOpen(true);

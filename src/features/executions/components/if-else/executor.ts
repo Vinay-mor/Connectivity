@@ -13,12 +13,13 @@ export type IfElseData = {
 export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
     data,
     nodeId,
+    workflowId,
     context,
     step,
     publish,
 }) => {
     await publish(
-        ifElseChannel().status({
+        ifElseChannel(workflowId).status({
             nodeId,
             status: "loading",
         }),
@@ -28,7 +29,7 @@ export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
         const result = await step.run(`if-else-${nodeId}`, async () => {
             if (!data.variableName) {
                 await publish(
-                    ifElseChannel().status({
+                    ifElseChannel(workflowId).status({
                         nodeId,
                         status: "error",
                     }),
@@ -38,7 +39,7 @@ export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
 
             if (!data.leftValue) {
                 await publish(
-                    ifElseChannel().status({
+                    ifElseChannel(workflowId).status({
                         nodeId,
                         status: "error",
                     }),
@@ -48,7 +49,7 @@ export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
 
             if (!data.operator) {
                 await publish(
-                    ifElseChannel().status({
+                    ifElseChannel(workflowId).status({
                         nodeId,
                         status: "error",
                     }),
@@ -56,8 +57,21 @@ export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
                 throw new NonRetriableError("If/Else node: Comparison operator not configured");
             }
 
+            const isBinaryOperator = ["equals", "not_equals", "contains", "greater_than", "less_than"].includes(data.operator);
+            if (isBinaryOperator && (data.rightValue === undefined || data.rightValue === null)) {
+                await publish(
+                    ifElseChannel(workflowId).status({
+                        nodeId,
+                        status: "error",
+                    }),
+                );
+                throw new NonRetriableError("If/Else node: Right value expression not configured");
+            }
+
             const evaluatedLeft = Handlebars.compile(data.leftValue)(context);
-            const evaluatedRight = data.rightValue ? Handlebars.compile(data.rightValue)(context) : "";
+            const evaluatedRight = data.rightValue !== undefined && data.rightValue !== null
+                ? Handlebars.compile(data.rightValue)(context)
+                : "";
 
             let conditionMet = false;
 
@@ -104,7 +118,7 @@ export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
         });
 
         await publish(
-            ifElseChannel().status({
+            ifElseChannel(workflowId).status({
                 nodeId,
                 status: "success",
             }),
@@ -112,7 +126,7 @@ export const ifElseExecutor: NodeExecutor<IfElseData> = async ({
         return result;
     } catch (error) {
         await publish(
-            ifElseChannel().status({
+            ifElseChannel(workflowId).status({
                 nodeId,
                 status: "error",
             }),

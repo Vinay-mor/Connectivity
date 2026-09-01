@@ -42,7 +42,7 @@ export const executeWorkflow = inngest.createFunction(
             anthropicChannel(),
             discordChannel(),
             slackChannel(),
-            ifElseChannel(),
+            ifElseChannel,
         ],
     },
     async ({ event, step, publish }) => {
@@ -91,10 +91,13 @@ export const executeWorkflow = inngest.createFunction(
         let context = event.data.initialData || {};
 
         // Active node reachability set to support conditional branching (If/Else)
-        // By default, trigger/initial nodes are active.
+        // Seed activeNodeIds with all root nodes (nodes with no incoming connections)
+        const incomingNodeIds = new Set(connections.map((conn) => conn.toNodeId));
         const activeNodeIds = new Set<string>();
-        if (sortedNodes.length > 0) {
-            activeNodeIds.add(sortedNodes[0].id);
+        for (const node of sortedNodes) {
+            if (!incomingNodeIds.has(node.id)) {
+                activeNodeIds.add(node.id);
+            }
         }
 
         for (const node of sortedNodes) {
@@ -108,6 +111,7 @@ export const executeWorkflow = inngest.createFunction(
                 data: node.data as Record<string, unknown>,
                 nodeId: node.id,
                 userId,
+                workflowId,
                 context,
                 step,
                 publish,
