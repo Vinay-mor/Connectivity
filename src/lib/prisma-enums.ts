@@ -17,6 +17,7 @@ export const NodeType = {
     OPENAI: "OPENAI",
     DISCORD: "DISCORD",
     SLACK: "SLACK",
+    IF_ELSE: "IF_ELSE",
 } as const;
 
 export type NodeType = (typeof NodeType)[keyof typeof NodeType];
