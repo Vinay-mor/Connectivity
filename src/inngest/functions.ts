@@ -14,6 +14,8 @@ import { anthropicChannel } from "./channels/anthropic";
 import { discordChannel } from "./channels/discord";
 import { slackChannel } from "./channels/slack";
 import { ifElseChannel } from "./channels/if-else";
+import { googleSheetsChannel } from "./channels/google-sheets";
+import { googleSheetsTriggerChannel } from "./channels/google-sheets-trigger";
 
 export const executeWorkflow = inngest.createFunction(
     {
@@ -43,6 +45,8 @@ export const executeWorkflow = inngest.createFunction(
             discordChannel(),
             slackChannel(),
             ifElseChannel,
+            googleSheetsChannel(),
+            googleSheetsTriggerChannel(),
         ],
     },
     async ({ event, step, publish }) => {

@@ -43,6 +43,13 @@ const triggerNodes: NodeTypeOption[] = [
     description: "Runs the flow when a Stripe Event is captured",
     icon: "/logos/stripe.svg",
   },
+  {
+    type: NodeType.GOOGLE_SHEETS_TRIGGER,
+    label: "Google Sheets Trigger",
+    description: "Runs the flow when a new row is added or updated in a Google Sheet",
+    icon: "/logos/google-sheets.svg",
+    iconClassName: "size-5 object-contain",
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -92,6 +99,13 @@ const executionNodes: NodeTypeOption[] = [
     label: "If / Else Condition",
     description: "Branch workflow execution paths based on evaluated node conditions",
     icon: GitForkIcon,
+  },
+  {
+    type: NodeType.GOOGLE_SHEETS,
+    label: "Google Sheets",
+    description: "Append rows or interact with Google Sheets spreadsheets",
+    icon: "/logos/google-sheets.svg",
+    iconClassName: "size-5 object-contain",
   },
 ];
 
