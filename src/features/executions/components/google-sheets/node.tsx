@@ -1,0 +1,84 @@
+"use client";
+
+import { useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { memo, useState } from "react";
+import { BaseExecutionNode } from "../base-execution-node";
+import { useNodeStatus } from "../../hooks/use-node-status";
+import { fetchGoogleSheetsRealtimeToken } from "./actions";
+import { GoogleSheetsDialog, GoogleSheetsFormValues } from "./dialog";
+import { GOOGLE_SHEETS_CHANNEL_NAME } from "@/inngest/channels/google-sheets";
+
+type GoogleSheetsNodeData = {
+    variableName?: string;
+    spreadsheetId?: string;
+    sheetName?: string;
+    values?: string;
+    secret?: string;
+    apiKey?: string;
+};
+
+type GoogleSheetsNodeType = Node<GoogleSheetsNodeData>;
+
+export const GoogleSheetsNode = memo((props: NodeProps<GoogleSheetsNodeType>) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const { setNodes } = useReactFlow();
+
+    const nodeStatus = useNodeStatus({
+        nodeId: props.id,
+        channel: GOOGLE_SHEETS_CHANNEL_NAME,
+        topic: "status",
+        refreshToken: fetchGoogleSheetsRealtimeToken,
+    });
+
+    const handleOpenSettings = () => setDialogOpen(true);
+
+    const handleSubmit = (values: GoogleSheetsFormValues) => {
+        setNodes((nodes) =>
+            nodes.map((node) => {
+                if (node.id === props.id) {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            variableName: values.variableName,
+                            spreadsheetId: values.spreadsheetId,
+                            sheetName: values.sheetName,
+                            values: values.values,
+                            secret: values.secret,
+                            apiKey: values.apiKey,
+                        },
+                    };
+                }
+                return node;
+            })
+        );
+    };
+
+    const nodeData = props.data;
+    const description = nodeData?.spreadsheetId
+        ? `Sheet: ${nodeData.sheetName || "Sheet1"}`
+        : "Not configured";
+
+    return (
+        <>
+            <GoogleSheetsDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                onSubmit={handleSubmit}
+                defaultValues={nodeData}
+            />
+            <BaseExecutionNode
+                {...props}
+                id={props.id}
+                icon="/logos/google-sheets.svg"
+                name="Google Sheets"
+                status={nodeStatus}
+                description={description}
+                onSettings={handleOpenSettings}
+                onDoubleClick={handleOpenSettings}
+            />
+        </>
+    );
+});
+
+GoogleSheetsNode.displayName = "GoogleSheetsNode";
