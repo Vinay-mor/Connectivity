@@ -13,6 +13,7 @@ type GoogleSheetsNodeData = {
     spreadsheetId?: string;
     sheetName?: string;
     values?: string;
+    secret?: string;
     apiKey?: string;
 };
 
@@ -43,6 +44,7 @@ export const GoogleSheetsNode = memo((props: NodeProps<GoogleSheetsNodeType>) =>
                             spreadsheetId: values.spreadsheetId,
                             sheetName: values.sheetName,
                             values: values.values,
+                            secret: values.secret,
                             apiKey: values.apiKey,
                         },
                     };

@@ -10,11 +10,127 @@ Handlebars.registerHelper("json", (context) => {
     return new Handlebars.SafeString(jsonString);
 });
 
+const PERMITTED_HOST_PATTERNS = [
+    /^([a-z0-9-]+\.)*script\.google\.com$/i,
+    /^([a-z0-9-]+\.)*script\.googleusercontent\.com$/i,
+    /^([a-z0-9-]+\.)*google\.com$/i,
+    /^([a-z0-9-]+\.)*googleusercontent\.com$/i,
+];
+
+function isPrivateOrReservedHost(hostname: string): boolean {
+    const host = hostname.toLowerCase().trim();
+
+    if (
+        host === "localhost" ||
+        host.endsWith(".local") ||
+        host.endsWith(".internal") ||
+        host.endsWith(".localhost")
+    ) {
+        return true;
+    }
+
+    const ipv4Match = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (ipv4Match) {
+        const [, oct1, oct2] = ipv4Match.map(Number);
+        if (oct1 === 127) return true;
+        if (oct1 === 10) return true;
+        if (oct1 === 0) return true;
+        if (oct1 === 169 && oct2 === 254) return true;
+        if (oct1 === 172 && oct2 >= 16 && oct2 <= 31) return true;
+        if (oct1 === 192 && oct2 === 168) return true;
+        if (oct1 >= 224) return true;
+    }
+
+    if (host === "::1" || host === "[::1]" || host === "0:0:0:0:0:0:0:1") {
+        return true;
+    }
+
+    return false;
+}
+
+function validateWebhookUrl(urlStr: string): URL {
+    let parsed: URL;
+    try {
+        parsed = new URL(urlStr);
+    } catch {
+        throw new NonRetriableError(`Google Sheets Webhook Error: Invalid URL format (${urlStr})`);
+    }
+
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+        throw new NonRetriableError(`Google Sheets Webhook Error: Unsupported protocol '${parsed.protocol}'`);
+    }
+
+    const hostname = parsed.hostname;
+
+    if (isPrivateOrReservedHost(hostname)) {
+        throw new NonRetriableError(
+            `Google Sheets Webhook Security Error: Destination host '${hostname}' is a reserved, loopback, or private address`
+        );
+    }
+
+    const isPermitted = PERMITTED_HOST_PATTERNS.some((pattern) => pattern.test(hostname));
+    if (!isPermitted) {
+        throw new NonRetriableError(
+            `Google Sheets Webhook Security Error: Webhook host '${hostname}' is not an allowed destination. Only Google Apps Script domains are permitted.`
+        );
+    }
+
+    return parsed;
+}
+
+async function fetchValidatedWebhook(initialUrl: string, payloadString: string): Promise<string> {
+    let currentUrl = initialUrl;
+    let redirectCount = 0;
+    const maxRedirects = 5;
+
+    while (redirectCount <= maxRedirects) {
+        const validatedUrlObj = validateWebhookUrl(currentUrl);
+
+        const isRedirect = redirectCount > 0;
+        const options: RequestInit = {
+            method: isRedirect ? "GET" : "POST",
+            headers: isRedirect ? {} : { "Content-Type": "text/plain;charset=utf-8" },
+            body: isRedirect ? undefined : payloadString,
+            redirect: "manual",
+        };
+
+        const response = await fetch(validatedUrlObj.toString(), options);
+
+        if ([301, 302, 303, 307, 308].includes(response.status)) {
+            const location = response.headers.get("location");
+            if (!location) {
+                throw new NonRetriableError(
+                    `Google Sheets Webhook Error: Redirect status ${response.status} returned without Location header`
+                );
+            }
+
+            const nextUrl = new URL(location, validatedUrlObj).toString();
+            validateWebhookUrl(nextUrl);
+            currentUrl = nextUrl;
+            redirectCount++;
+            continue;
+        }
+
+        const textRes = await response.text();
+
+        if (textRes.includes("accounts.google.com") || textRes.includes("Sign in")) {
+            throw new NonRetriableError(
+                "Google Sheets Web App Permission Error: Make sure your Web App deployment settings has 'Who has access' set to 'Anyone'."
+            );
+        }
+
+        return textRes;
+    }
+
+    throw new NonRetriableError("Google Sheets Webhook Error: Exceeded maximum redirect limit");
+}
+
 type GoogleSheetsData = {
     variableName?: string;
     spreadsheetId?: string;
     sheetName?: string;
     values?: string;
+    secret?: string;
     apiKey?: string;
 };
 
@@ -71,6 +187,9 @@ export const googleSheetsExecutor: NodeExecutor<GoogleSheetsData> = async ({
     const rawValues = Handlebars.compile(data.values)(context);
     const valuesString = decode(rawValues).trim();
 
+    const rawSecret = data.secret ? Handlebars.compile(data.secret)(context) : "";
+    const secret = decode(rawSecret).trim();
+
     let parsedRow: any[] = [];
     try {
         if (valuesString.startsWith("[") && valuesString.endsWith("]")) {
@@ -87,69 +206,35 @@ export const googleSheetsExecutor: NodeExecutor<GoogleSheetsData> = async ({
             const isWebhookUrl = spreadsheetId.startsWith("http://") || spreadsheetId.startsWith("https://");
 
             if (isWebhookUrl) {
-                // Ensure URL ends with /exec if it's a Google Apps Script URL
                 let finalUrl = spreadsheetId;
                 if (finalUrl.includes("script.google.com") && finalUrl.endsWith("/edit")) {
                     finalUrl = finalUrl.replace(/\/edit$/, "/exec");
                 }
 
+                if (secret) {
+                    try {
+                        const urlObj = new URL(finalUrl);
+                        urlObj.searchParams.set("secret", secret);
+                        finalUrl = urlObj.toString();
+                    } catch {
+                        finalUrl += (finalUrl.includes("?") ? "&" : "?") + `secret=${encodeURIComponent(secret)}`;
+                    }
+                }
+
                 const payloadString = JSON.stringify({
                     sheetName,
                     values: parsedRow,
+                    ...(secret ? { secret } : {}),
                 });
 
                 let resData: any = { status: "success" };
 
+                const textRes = await fetchValidatedWebhook(finalUrl, payloadString);
+
                 try {
-                    // Node.js native fetch handles Google Apps Script 302 redirects smoothly when using text/plain
-                    const response = await fetch(finalUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "text/plain;charset=utf-8",
-                        },
-                        body: payloadString,
-                        redirect: "follow",
-                    });
-
-                    const textRes = await response.text();
-
-                    // Check if response redirected to Google accounts login page
-                    if (textRes.includes("accounts.google.com") || textRes.includes("Sign in")) {
-                        throw new NonRetriableError(
-                            "Google Sheets Web App Permission Error: Make sure your Web App deployment settings has 'Who has access' set to 'Anyone'."
-                        );
-                    }
-
-                    try {
-                        resData = JSON.parse(textRes);
-                    } catch {
-                        resData = { status: "success", responseText: textRes.slice(0, 500) };
-                    }
-                } catch (fetchError: any) {
-                    if (fetchError instanceof NonRetriableError) {
-                        throw fetchError;
-                    }
-
-                    // Fallback to ky if native fetch failed
-                    try {
-                        const kyRes = await ky.post(finalUrl, {
-                            body: payloadString,
-                            headers: {
-                                "Content-Type": "text/plain;charset=utf-8",
-                            },
-                            redirect: "follow",
-                        }).text();
-
-                        try {
-                            resData = JSON.parse(kyRes);
-                        } catch {
-                            resData = { status: "success", responseText: kyRes.slice(0, 500) };
-                        }
-                    } catch (kyError: any) {
-                        throw new NonRetriableError(
-                            `Google Sheets Webhook Failed: ${kyError.message || fetchError.message || "Network Error"}. Please verify your Web App URL and set deployment access to 'Anyone'.`
-                        );
-                    }
+                    resData = JSON.parse(textRes);
+                } catch {
+                    resData = { status: "success", responseText: textRes.slice(0, 500) };
                 }
 
                 return {

@@ -44,6 +44,9 @@ const formSchema = z.object({
     values: z
         .string()
         .min(1, "Row values or content is required"),
+    secret: z
+        .string()
+        .optional(),
     apiKey: z
         .string()
         .optional(),
@@ -71,6 +74,7 @@ export const GoogleSheetsDialog = ({
             spreadsheetId: defaultValues.spreadsheetId || "",
             sheetName: defaultValues.sheetName || "Sheet1",
             values: defaultValues.values || "",
+            secret: defaultValues.secret || "",
             apiKey: defaultValues.apiKey || "",
         },
     });
@@ -82,6 +86,7 @@ export const GoogleSheetsDialog = ({
                 spreadsheetId: defaultValues.spreadsheetId || "",
                 sheetName: defaultValues.sheetName || "Sheet1",
                 values: defaultValues.values || "",
+                secret: defaultValues.secret || "",
                 apiKey: defaultValues.apiKey || "",
             });
         }
@@ -95,7 +100,8 @@ export const GoogleSheetsDialog = ({
     };
 
     const handleCopyScript = async () => {
-        const script = generateGoogleSheetsScript();
+        const secret = form.getValues("secret");
+        const script = generateGoogleSheetsScript(secret);
         try {
             await navigator.clipboard.writeText(script);
             toast.success("Google Apps Script copied to clipboard!");
@@ -125,8 +131,8 @@ export const GoogleSheetsDialog = ({
                         <ol className="text-muted-foreground space-y-1 list-decimal list-inside leading-relaxed">
                             <li>Open your Google Spreadsheet.</li>
                             <li>Click <b>Extensions ➔ Apps Script</b>.</li>
-                            <li>Click the button below and paste the code into Apps Script.</li>
-                            <li>Click <b>Deploy ➔ New deployment ➔ Web app</b> (Set Access: <b>Anyone</b>).</li>
+                            <li>Set your <b>Secret Token</b> below, then click the copy button to get the authenticated code.</li>
+                            <li>Click <b>Deploy ➔ New deployment ➔ Web app</b> (Set Access: <b>Anyone</b>). <i>(Note: Setting Access to Anyone allows public HTTP reachability, so application-level authentication via your Secret Token in doPost is required to authorize requests server-side).</i></li>
                             <li>Copy the generated Web App URL into the field below.</li>
                         </ol>
                         <div className="pt-1">
@@ -181,6 +187,26 @@ export const GoogleSheetsDialog = ({
                                         </FormControl>
                                         <FormDescription className="text-xs">
                                             Paste your Apps Script Web App URL (or Google Sheets API ID).
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="secret"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Secret Token (Application Authentication)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="Secret Token (e.g. my-secret-key)"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Per-node secret token used to authenticate requests server-side in your Apps Script Web App.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

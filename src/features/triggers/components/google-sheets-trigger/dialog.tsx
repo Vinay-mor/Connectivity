@@ -13,7 +13,9 @@ import { Label } from "@/components/ui/label";
 import { CopyIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { generateGoogleSheetsTriggerScript } from "./utils";
+import { getGoogleSheetsWebhookSecret } from "./actions";
 
 interface Props {
     open: boolean;
@@ -27,7 +29,17 @@ export const GoogleSheetsTriggerDialog = ({
     const params = useParams();
     const workflowId = params.workflowId as string;
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const webhookUrl = `${baseUrl}/api/webhooks/google-sheets?workflowId=${workflowId}`;
+    const [secret, setSecret] = useState<string>("");
+
+    useEffect(() => {
+        if (workflowId) {
+            getGoogleSheetsWebhookSecret(workflowId).then(setSecret).catch(console.error);
+        }
+    }, [workflowId]);
+
+    const secretParam = secret ? `&secret=${secret}` : "";
+    const webhookUrl = `${baseUrl}/api/webhooks/google-sheets?workflowId=${workflowId}${secretParam}`;
+
 
     const copyToClipboard = async () => {
         try {
